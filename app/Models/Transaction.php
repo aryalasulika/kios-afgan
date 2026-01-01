@@ -12,6 +12,10 @@ class Transaction extends Model
         'payment_method',
         'cash_received',
         'change_amount',
+        'customer_name',
+        'status',
+        'settlement_method',
+        'settlement_at',
     ];
 
     protected $casts = [

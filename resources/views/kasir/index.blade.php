@@ -18,15 +18,18 @@
 
     <style>
         @media print {
+
             /* Hide everything by default */
             body * {
                 visibility: hidden;
-                height: 0; /* Try to collapse space */
+                height: 0;
+                /* Try to collapse space */
                 overflow: hidden;
             }
-            
+
             /* Unhide the receipt and its children */
-            #receipt, #receipt * {
+            #receipt,
+            #receipt * {
                 visibility: visible;
                 height: auto;
                 overflow: visible;
@@ -34,13 +37,16 @@
 
             /* Position the receipt at the top left */
             #receipt {
-                display: block !important; /* Override Tailwind 'hidden' */
+                display: block !important;
+                /* Override Tailwind 'hidden' */
                 position: absolute;
                 left: 0;
                 top: 0;
-                width: 80mm !important; /* Force width */
+                width: 80mm !important;
+                /* Force width */
                 margin: 0;
-                padding: 10px; /* Minimal padding */
+                padding: 10px;
+                /* Minimal padding */
                 background-color: white !important;
                 color: black !important;
                 font-family: 'Courier New', Courier, monospace !important;
@@ -52,9 +58,10 @@
             .print\:hidden {
                 display: none !important;
             }
-            
+
             /* Hide modal backgrounds or overlays if they interfere */
-            #successModal, .modal-backdrop {
+            #successModal,
+            .modal-backdrop {
                 display: none !important;
             }
         }
@@ -68,7 +75,7 @@
             <p>Telp: 0812-3456-7890</p>
             <p class="mt-2" id="receiptDate">--/--/---- --:--</p>
         </div>
-        
+
         <div class="mb-2 border-b-2 border-dashed border-gray-400 pb-2">
             <div class="flex justify-between">
                 <span>Invoice:</span>
@@ -190,6 +197,10 @@
                                 class="flex-1 py-3 text-lg font-bold border-2 border-gray-300 text-gray-600 rounded transition-colors hover:border-blue-400">
                                 QRIS
                             </button>
+                            <button onclick="setPaymentMethod('bon')" id="btnBon"
+                                class="flex-1 py-3 text-lg font-bold border-2 border-gray-300 text-gray-600 rounded transition-colors hover:border-blue-400">
+                                BON
+                            </button>
                         </div>
 
                         <!-- Cash Input Section -->
@@ -205,11 +216,20 @@
                             </div>
                         </div>
 
-                        <!-- QRIS Instructions (Hidden by default) -->
+                        <!-- QRIS Instructions -->
                         <div id="qrisSection" class="hidden text-center py-4 bg-gray-50 rounded mb-4">
                             <p class="text-lg font-bold text-gray-800">Silahkan Scan QRIS</p>
                             <p class="text-sm text-gray-500">Pastikan pembayaran berhasil sebelum menyelesaikan
                                 transaksi.</p>
+                        </div>
+
+                        <!-- Bon Input Section -->
+                        <div id="bonInputSection" class="hidden">
+                            <label class="block text-gray-700 font-bold mb-2">Nama Pelanggan / Catatan</label>
+                            <input type="text" id="customerName"
+                                class="w-full text-xl p-3 border rounded mb-4 focus:border-blue-600 focus:outline-none"
+                                placeholder="Masukkan nama pelanggan...">
+                            <p class="text-sm text-red-500 italic">* Wajib diisi untuk transaksi Bon</p>
                         </div>
                     </div>
 
@@ -242,47 +262,57 @@
                 </div>
             </div>
 
-    <!-- Success Modal -->
-    <div id="successModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center z-[60]">
-        <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md text-center transform transition-all scale-100 border-t-8 border-green-500">
-            <div class="mb-6">
-                <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-green-100 mb-4 animate-bounce">
-                    <svg class="h-12 w-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                </div>
-                <h3 class="text-3xl font-extrabold text-gray-900 mb-2">Transaksi Berhasil!</h3>
-                <p class="text-gray-500 text-lg">Pesanan telah berhasil direkam.</p>
-            </div>
-            
-            <div class="bg-gray-50 rounded-lg p-4 mb-8">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-gray-600">Total Transaksi</span>
-                    <span class="text-xl font-bold text-gray-900" id="successTotal">Rp 0</span>
-                </div>
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-gray-600">Metode Pembayaran</span>
-                    <span class="font-bold text-gray-900 uppercase" id="successMethod">-</span>
-                </div>
-                <div id="successChangeInfo" class="flex justify-between items-center hidden border-t pt-2 mt-2">
-                    <span class="text-gray-600">Kembalian</span>
-                    <span class="text-xl font-bold text-green-600" id="successChange">Rp 0</span>
-                </div>
-            </div>
+            <!-- Success Modal -->
+            <div id="successModal"
+                class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center z-[60]">
+                <div
+                    class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md text-center transform transition-all scale-100 border-t-8 border-green-500">
+                    <div class="mb-6">
+                        <div
+                            class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-green-100 mb-4 animate-bounce">
+                            <svg class="h-12 w-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-3xl font-extrabold text-gray-900 mb-2">Transaksi Berhasil!</h3>
+                        <p class="text-gray-500 text-lg">Pesanan telah berhasil direkam.</p>
+                    </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="window.print()" class="w-full bg-white hover:bg-gray-50 text-gray-700 font-bold py-3 px-4 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">
-                    <span class="flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                        Cetak Struk
-                    </span>
-                </button>
-                <button onclick="closeSuccessModal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                    Transaksi Baru
-                </button>
+                    <div class="bg-gray-50 rounded-lg p-4 mb-8">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-600">Total Transaksi</span>
+                            <span class="text-xl font-bold text-gray-900" id="successTotal">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-600">Metode Pembayaran</span>
+                            <span class="font-bold text-gray-900 uppercase" id="successMethod">-</span>
+                        </div>
+                        <div id="successChangeInfo" class="flex justify-between items-center hidden border-t pt-2 mt-2">
+                            <span class="text-gray-600">Kembalian</span>
+                            <span class="text-xl font-bold text-green-600" id="successChange">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="window.print()"
+                            class="w-full bg-white hover:bg-gray-50 text-gray-700 font-bold py-3 px-4 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                            <span class="flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                                    </path>
+                                </svg>
+                                Cetak Struk
+                            </span>
+                        </button>
+                        <button onclick="closeSuccessModal()"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            Transaksi Baru
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
             <script>
                 // State
                 let cart = [];
@@ -497,41 +527,53 @@
                     barcodeInput.focus();
                 }
 
+                const btnBon = document.getElementById('btnBon');
+                const bonInputSection = document.getElementById('bonInputSection');
+                const customerNameInput = document.getElementById('customerName');
+
                 function setPaymentMethod(method) {
                     currentPaymentMethod = method;
+
+                    // Reset all styles
+                    [btnCash, btnQris, btnBon].forEach(btn => {
+                        btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+                        btn.classList.add('border-gray-300', 'text-gray-600');
+                    });
+
+                    // Hide all sections
+                    cashInputSection.classList.add('hidden');
+                    qrisSection.classList.add('hidden');
+                    bonInputSection.classList.add('hidden');
+
                     if (method === 'cash') {
                         btnCash.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
                         btnCash.classList.remove('border-gray-300', 'text-gray-600');
-
-                        btnQris.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
-                        btnQris.classList.add('border-gray-300', 'text-gray-600'); // Reset style
-
                         cashInputSection.classList.remove('hidden');
-                        qrisSection.classList.add('hidden');
                         setTimeout(() => cashReceivedInput.focus(), 100);
-                    } else {
+                    } else if (method === 'qris') {
                         btnQris.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
                         btnQris.classList.remove('border-gray-300', 'text-gray-600');
-
-                        btnCash.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
-                        btnCash.classList.add('border-gray-300', 'text-gray-600');
-
-                        cashInputSection.classList.add('hidden');
                         qrisSection.classList.remove('hidden');
-                        btnConfirmPayment.disabled = false; // Always enable for QRIS
+                    } else if (method === 'bon') {
+                        btnBon.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+                        btnBon.classList.remove('border-gray-300', 'text-gray-600');
+                        bonInputSection.classList.remove('hidden');
+                        setTimeout(() => customerNameInput.focus(), 100);
                     }
                     validatePayment();
                 }
 
-                // Calculate Change
-                cashReceivedInput.addEventListener('input', validatePayment);
-                cashReceivedInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') submitPayment();
-                });
+                // Customer Name Validation
+                customerNameInput.addEventListener('input', validatePayment);
 
                 function validatePayment() {
                     if (currentPaymentMethod === 'qris') {
                         btnConfirmPayment.disabled = false;
+                        return;
+                    }
+
+                    if (currentPaymentMethod === 'bon') {
+                        btnConfirmPayment.disabled = customerNameInput.value.trim() === '';
                         return;
                     }
 
@@ -559,6 +601,7 @@
                     const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
                     const received = parseFloat(cashReceivedInput.value) || 0;
                     const change = currentPaymentMethod === 'cash' ? (received - total) : 0;
+                    const customerName = currentPaymentMethod === 'bon' ? customerNameInput.value.trim() : null;
 
                     try {
                         const res = await fetch('{{ route('kasir.transaction') }}', {
@@ -576,7 +619,8 @@
                                 total: total,
                                 payment_method: currentPaymentMethod,
                                 cash_received: currentPaymentMethod === 'cash' ? received : null,
-                                change_amount: change
+                                change_amount: change,
+                                customer_name: customerName
                             })
                         });
 
@@ -589,7 +633,8 @@
                                 method: currentPaymentMethod,
                                 change: change,
                                 received: received,
-                                items: [...cart]
+                                items: [...cart],
+                                customer_name: customerName
                             };
                             showSuccessModal(transactionData);
                             cart = [];
@@ -608,8 +653,13 @@
                 function showSuccessModal(data) {
                     // Update Modal
                     document.getElementById('successTotal').innerText = `Rp ${data.total.toLocaleString('id-ID')}`;
-                    document.getElementById('successMethod').innerText = data.method === 'qris' ? 'QRIS' : 'TUNAI';
-                    
+
+                    let methodLabel = 'TUNAI';
+                    if (data.method === 'qris') methodLabel = 'QRIS';
+                    if (data.method === 'bon') methodLabel = `BON (${data.customer_name || '-'})`;
+
+                    document.getElementById('successMethod').innerText = methodLabel;
+
                     const changeInfo = document.getElementById('successChangeInfo');
                     if (data.method === 'cash') {
                         document.getElementById('successChange').innerText = `Rp ${data.change.toLocaleString('id-ID')}`;
@@ -623,8 +673,14 @@
                     document.getElementById('receiptDate').innerText = new Date().toLocaleString('id-ID');
                     document.getElementById('receiptMethod').innerText = data.method.toUpperCase();
                     document.getElementById('receiptTotal').innerText = `Rp ${data.total.toLocaleString('id-ID')}`;
-                    document.getElementById('receiptPaid').innerText = data.method === 'cash' ? `Rp ${data.received.toLocaleString('id-ID')}` : `Rp ${data.total.toLocaleString('id-ID')}`;
-                    document.getElementById('receiptChange').innerText = `Rp ${data.change.toLocaleString('id-ID')}`;
+
+                    if (data.method === 'bon') {
+                        document.getElementById('receiptPaid').innerText = 'BELUM LUNAS';
+                        document.getElementById('receiptChange').innerText = `Pelanggan: ${data.customer_name}`;
+                    } else {
+                        document.getElementById('receiptPaid').innerText = data.method === 'cash' ? `Rp ${data.received.toLocaleString('id-ID')}` : `Rp ${data.total.toLocaleString('id-ID')}`;
+                        document.getElementById('receiptChange').innerText = `Rp ${data.change.toLocaleString('id-ID')}`;
+                    }
 
                     const receiptItemsBody = document.getElementById('receiptItems');
                     receiptItemsBody.innerHTML = '';
@@ -650,7 +706,7 @@
                 }
 
                 // Global key listener for modals
-                document.addEventListener('keydown', function(e) {
+                document.addEventListener('keydown', function (e) {
                     if (e.key === 'Escape') {
                         // ... existing escape logic
                         if (!successModal.classList.contains('hidden')) {

@@ -64,18 +64,25 @@ class PosController extends Controller
             'items.*.id' => 'required|exists:products,id',
             'items.*.qty' => 'required|integer|min:1',
             'total' => 'required|numeric',
-            'payment_method' => 'required|in:cash,qris',
-            'cash_received' => 'nullable|numeric|gte:total',
-            'change_amount' => 'nullable|numeric',
+            'payment_method' => 'required',
+            'customer_name' => 'nullable|string',
         ]);
 
         return \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+            $isBon = $request->payment_method === 'bon';
+
+            if ($isBon && empty($request->customer_name)) {
+                return response()->json(['success' => false, 'message' => 'Nama pelanggan wajib diisi untuk Bon.'], 400);
+            }
+
             $transaction = \App\Models\Transaction::create([
                 'kasir_id' => auth('kasir')->id(),
                 'total_amount' => $request->total,
                 'payment_method' => $request->payment_method,
-                'cash_received' => $request->cash_received,
-                'change_amount' => $request->change_amount ?? 0,
+                'cash_received' => $isBon ? 0 : $request->cash_received,
+                'change_amount' => $isBon ? 0 : ($request->change_amount ?? 0),
+                'status' => $isBon ? 'unpaid' : 'paid',
+                'customer_name' => $isBon ? $request->customer_name : null,
             ]);
 
             foreach ($request->items as $item) {

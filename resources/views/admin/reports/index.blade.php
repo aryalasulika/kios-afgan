@@ -43,9 +43,34 @@
                 </select>
             </div>
 
+            <!-- Payment Filter -->
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Metode</label>
+                <select name="payment_method" class="shadow border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline w-32">
+                    <option value="">Semua</option>
+                    <option value="cash" {{ request('payment_method') === 'cash' ? 'selected' : '' }}>Tunai</option>
+                    <option value="qris" {{ request('payment_method') === 'qris' ? 'selected' : '' }}>QRIS</option>
+                    <option value="bon" {{ request('payment_method') === 'bon' ? 'selected' : '' }}>Bon</option>
+                </select>
+            </div>
+
+            <!-- Status Filter -->
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Status</label>
+                <select name="status" class="shadow border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline w-32">
+                    <option value="">Semua</option>
+                    <option value="paid" {{ request('status') === 'paid' ? 'selected' : '' }}>Lunas</option>
+                    <option value="unpaid" {{ request('status') === 'unpaid' ? 'selected' : '' }}>Belum Lunas</option>
+                </select>
+            </div>
+
             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded h-10">
                 Filter
             </button>
+            
+            <a href="{{ route('reports.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded h-10 flex items-center justify-center">
+                Reset
+            </a>
         </form>
     </div>
 
@@ -116,6 +141,9 @@
                             class="px-5 py-3 border-b-2 border-gray-200 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
                             Total</th>
                         <th
+                            class="px-5 py-3 border-b-2 border-gray-200 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                            Status</th>
+                        <th
                             class="px-5 py-3 border-b-2 border-gray-200 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider min-w-[200px]">
                             Items</th>
                     </tr>
@@ -124,7 +152,7 @@
                     @forelse($transactions as $trx)
                         <tr>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center whitespace-nowrap">
-                                {{ $trx->created_at->format('H:i') }}
+                                {{ $trx->created_at->format('d/m/Y H:i') }}
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center whitespace-nowrap">
                                 #{{ $trx->id }}
@@ -133,14 +161,33 @@
                                 {{ $trx->kasir->username }}
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center whitespace-nowrap">
-                                <span
-                                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $trx->payment_method === 'cash' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800' }}">
-                                    {{ strtoupper($trx->payment_method) }}
+                                @php
+                                    $method = strtolower(trim($trx->payment_method));
+                                    $badges = [
+                                        'cash' => 'bg-green-100 text-green-800',
+                                        'qris' => 'bg-purple-100 text-purple-800',
+                                        'bon'  => 'bg-orange-100 text-orange-800',
+                                    ];
+                                    $badgeClass = $badges[$method] ?? 'bg-gray-100 text-gray-800';
+                                @endphp
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $badgeClass }}">
+                                    {{ strtoupper($method) }}
                                 </span>
                             </td>
                             <td
                                 class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center font-bold whitespace-nowrap">
                                 Rp {{ number_format($trx->total_amount, 0, ',', '.') }}
+                            </td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center whitespace-nowrap">
+                                @if($trx->status === 'paid')
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Lunas
+                                    </span>
+                                @else
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        Belum Lunas
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
                                 <ul class="list-disc list-inside text-xs text-gray-600 inline-block text-left">
@@ -152,7 +199,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-5 py-5 bg-white text-sm text-center">Tidak ada transaksi pada tanggal ini.
+                            <td colspan="7" class="px-5 py-5 bg-white text-sm text-center">Tidak ada transaksi pada tanggal ini.
                             </td>
                         </tr>
                     @endforelse

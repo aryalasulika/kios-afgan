@@ -51,6 +51,15 @@ class ReportController extends Controller
                 break;
         }
 
+        // Filters
+        if ($request->filled('payment_method')) {
+            $query->where('payment_method', $request->payment_method);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
         // Clone for totals
         $totalsQuery = clone $query;
 
@@ -58,15 +67,20 @@ class ReportController extends Controller
         $transactions = $query->paginate(20);
 
         // Calculate totals from the full result set (not just the page)
-        // For Cash/QRIS split, I also need to sum from the full query or a cloned query
-        // Since I can't filter the already executed builder easily without cloning again or grouping.
         // Optimally:
-        $stats = $totalsQuery->selectRaw('count(*) as count, sum(total_amount) as revenue, sum(case when payment_method = "cash" then total_amount else 0 end) as cash, sum(case when payment_method = "qris" then total_amount else 0 end) as qris')->first();
+        $stats = $totalsQuery->selectRaw('
+            count(*) as count, 
+            sum(case when status = "paid" then total_amount else 0 end) as revenue, 
+            sum(case when payment_method = "cash" or settlement_method = "cash" then total_amount else 0 end) as cash, 
+            sum(case when payment_method = "qris" or settlement_method = "qris" then total_amount else 0 end) as qris,
+            sum(case when status = "unpaid" then total_amount else 0 end) as unpaid
+        ')->first();
 
         $totalRevenue = $stats->revenue ?? 0;
         $totalTransactions = $stats->count ?? 0;
         $totalCash = $stats->cash ?? 0;
         $totalQris = $stats->qris ?? 0;
+        $totalUnpaid = $stats->unpaid ?? 0;
 
         return view('admin.reports.index', compact(
             'transactions',
@@ -74,6 +88,7 @@ class ReportController extends Controller
             'totalTransactions',
             'totalCash',
             'totalQris',
+            'totalUnpaid',
             'period',
             'date',
             'month',
