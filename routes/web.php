@@ -24,4 +24,9 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('admin.index');
     Route::resource('products', \App\Http\Controllers\ProductController::class);
     Route::resource('reports', \App\Http\Controllers\ReportController::class)->only(['index']);
+
+    // Cashier Management
+    Route::resource('cashiers', \App\Http\Controllers\CashierController::class);
+    Route::patch('/cashiers/{id}/toggle-status', [\App\Http\Controllers\CashierController::class, 'toggleStatus'])->name('cashiers.toggle-status');
+    Route::patch('/cashiers/{id}/reset-pin', [\App\Http\Controllers\CashierController::class, 'resetPin'])->name('cashiers.reset-pin');
 });

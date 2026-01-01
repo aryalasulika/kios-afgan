@@ -31,7 +31,7 @@ class AuthController extends Controller
             // Use 'kasir' guard
             \Illuminate\Support\Facades\Auth::guard('kasir')->login($user);
             $request->session()->regenerate();
-            return redirect()->intended('/kasir');
+            return redirect('/kasir');
         }
 
         return back()->withErrors([
@@ -54,7 +54,7 @@ class AuthController extends Controller
             // Use 'admin' guard
             \Illuminate\Support\Facades\Auth::guard('admin')->login($user);
             $request->session()->regenerate();
-            return redirect()->intended('/admin');
+            return redirect('/admin');
         }
 
         return back()->withErrors([
