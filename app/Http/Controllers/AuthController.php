@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -13,7 +15,26 @@ class AuthController extends Controller
 
     public function loginAdminForm()
     {
-        return view('auth.admin-login');
+        $num1 = rand(1, 10);
+        $num2 = rand(1, 10);
+        $ops = ['+', '*', '-'];
+        $operator = $ops[array_rand($ops)];
+
+        switch ($operator) {
+            case '+':
+                $result = $num1 + $num2;
+                break;
+            case '*':
+                $result = $num1 * $num2;
+                break;
+            case '-':
+                $result = $num1 - $num2;
+                break;
+        }
+
+        session(['captcha_answer' => $result]);
+
+        return view('auth.admin-login', compact('num1', 'num2', 'operator'));
     }
 
     public function loginKasir(Request $request)
@@ -44,18 +65,37 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'username' => ['required'],
             'password' => ['required'],
+            'captcha' => ['required', 'numeric'],
         ]);
+
+        if ((int) $request->captcha !== (int) session('captcha_answer')) {
+            return back()->withErrors([
+                'captcha' => 'Verifikasi gagal. Jawaban matematika salah.',
+            ])->withInput();
+        }
+
+        $throttleKey = Str::lower($request->input('username')) . '|' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return back()->withErrors([
+                'username' => 'Terlalu banyak percobaan login. Silakan coba lagi dalam ' . $seconds . ' detik.',
+            ]);
+        }
 
         $user = \App\Models\User::where('username', $credentials['username'])
             ->where('role', 'admin')
             ->first();
 
         if ($user && \Illuminate\Support\Facades\Hash::check($credentials['password'], $user->password)) {
+            RateLimiter::clear($throttleKey);
             // Use 'admin' guard
             \Illuminate\Support\Facades\Auth::guard('admin')->login($user);
             $request->session()->regenerate();
             return redirect('/admin');
         }
+
+        RateLimiter::hit($throttleKey);
 
         return back()->withErrors([
             'username' => 'Password salah atau user tidak ditemukan.',
