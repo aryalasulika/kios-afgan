@@ -605,7 +605,7 @@
                     const customerName = currentPaymentMethod === 'bon' ? customerNameInput.value.trim() : null;
 
                     try {
-                        const res = await fetch('{{ route('kasir.transaction') }}', {
+                        const res = await fetch('/kasir/transaction', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
