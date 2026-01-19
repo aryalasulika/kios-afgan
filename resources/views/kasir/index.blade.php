@@ -564,6 +564,17 @@
                     validatePayment();
                 }
 
+                // Cash Received Input Validation
+                cashReceivedInput.addEventListener('input', validatePayment);
+
+                // Enter key to submit payment
+                cashReceivedInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !btnConfirmPayment.disabled) {
+                        e.preventDefault();
+                        submitPayment();
+                    }
+                });
+
                 // Customer Name Validation
                 customerNameInput.addEventListener('input', validatePayment);
 
