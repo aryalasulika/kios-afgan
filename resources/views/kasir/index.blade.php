@@ -72,8 +72,8 @@
     <div id="receipt" class="hidden bg-white p-4 max-w-[80mm] mx-auto text-sm font-mono leading-tight">
         <div class="text-center mb-4">
             <h2 class="text-xl font-bold uppercase">Kios Afgan</h2>
-            <p>Jl. Merdeka No. 123</p>
-            <p>Telp: 0812-3456-7890</p>
+            <p>Jl. Dr. Moh. Hatta, Bubung, Kabupaten Banggai, Sulawesi Tengah</p>
+            <p>Telp: 0813-4385-0840</p>
             <p class="mt-2" id="receiptDate">--/--/---- --:--</p>
         </div>
 
