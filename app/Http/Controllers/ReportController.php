@@ -8,47 +8,22 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        $period = $request->input('period', 'day');
-
-        // Defaults
-        $date = $request->input('date', date('Y-m-d'));
-        $month = $request->input('month', date('Y-m'));
-        $year = $request->input('year', date('Y'));
-
         $query = \App\Models\Transaction::with('kasir', 'items')->latest();
-        $label = "";
+        $label = "Semua Transaksi";
 
-        switch ($period) {
-            case 'day':
-                $query->whereDate('created_at', $date);
-                $label = \Carbon\Carbon::parse($date)->format('d M Y');
-                break;
-            case 'week':
-                $start = \Carbon\Carbon::parse($date)->startOfWeek();
-                $end = \Carbon\Carbon::parse($date)->endOfWeek();
-                $query->whereBetween('created_at', [$start, $end]);
-                $label = $start->format('d M Y') . ' - ' . $end->format('d M Y');
-                break;
-            case 'month':
-                // $month format YYYY-MM
-                try {
-                    $carbonDate = \Carbon\Carbon::createFromFormat('Y-m', $month);
-                    $query->whereYear('created_at', $carbonDate->year)
-                        ->whereMonth('created_at', $carbonDate->month);
-                    $label = $carbonDate->format('F Y');
-                } catch (\Exception $e) {
-                    // Fallback if invalid format
-                    $label = $month;
-                }
-                break;
-            case 'year':
-                $query->whereYear('created_at', $year);
-                $label = $year;
-                break;
-            default:
-                $query->whereDate('created_at', date('Y-m-d'));
-                $label = date('d M Y');
-                break;
+        // Date Range Filter
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('created_at', [
+                $request->start_date . ' 00:00:00',
+                $request->end_date . ' 23:59:59'
+            ]);
+            $label = \Carbon\Carbon::parse($request->start_date)->format('d M Y') . ' - ' . \Carbon\Carbon::parse($request->end_date)->format('d M Y');
+        } elseif ($request->filled('start_date')) {
+            $query->whereDate('created_at', '>=', $request->start_date);
+            $label = 'Sejak ' . \Carbon\Carbon::parse($request->start_date)->format('d M Y');
+        } elseif ($request->filled('end_date')) {
+            $query->whereDate('created_at', '<=', $request->end_date);
+            $label = 'Sampai ' . \Carbon\Carbon::parse($request->end_date)->format('d M Y');
         }
 
         // Filters
@@ -89,10 +64,6 @@ class ReportController extends Controller
             'totalCash',
             'totalQris',
             'totalUnpaid',
-            'period',
-            'date',
-            'month',
-            'year',
             'label'
         ));
     }

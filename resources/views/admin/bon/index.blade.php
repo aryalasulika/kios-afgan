@@ -17,45 +17,40 @@
     @endif
 
     <!-- Filters -->
-    <div class="bg-white p-4 rounded shadow mb-6">
-        <form action="{{ route('bon.index') }}" method="GET" class="flex flex-col md:flex-row gap-4 items-end">
-            <!-- Quick Presets -->
-            <div class="flex gap-2">
-                <a href="{{ route('bon.index', ['start_date' => date('Y-m-d'), 'end_date' => date('Y-m-d')]) }}" 
-                   class="px-3 py-2 text-sm font-medium bg-gray-200 hover:bg-gray-300 rounded text-gray-700">Hari Ini</a>
-                <a href="{{ route('bon.index', ['start_date' => now()->startOfWeek()->format('Y-m-d'), 'end_date' => now()->endOfWeek()->format('Y-m-d')]) }}" 
-                   class="px-3 py-2 text-sm font-medium bg-gray-200 hover:bg-gray-300 rounded text-gray-700">Minggu Ini</a>
-                <a href="{{ route('bon.index', ['start_date' => now()->startOfMonth()->format('Y-m-d'), 'end_date' => now()->endOfMonth()->format('Y-m-d')]) }}" 
-                   class="px-3 py-2 text-sm font-medium bg-gray-200 hover:bg-gray-300 rounded text-gray-700">Bulan Ini</a>
-            </div>
-
-            <!-- Date Range -->
-            <div class="flex flex-col sm:flex-row gap-2">
-                <div>
+    <div class="bg-white p-6 rounded shadow mb-6">
+        <form action="{{ route('bon.index') }}" method="GET">
+            <div class="flex flex-col md:flex-row md:justify-end gap-4 md:items-end">
+                <!-- Start Date -->
+                <div class="w-full md:w-auto">
                     <label class="block text-gray-700 text-xs font-bold mb-1">Mulai</label>
                     <input type="date" name="start_date" value="{{ request('start_date') }}" 
-                           class="shadow border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm">
+                           class="w-full shadow-sm border border-gray-300 rounded px-3 py-2 text-gray-700 text-sm focus:ring-blue-500 focus:border-blue-500">
                 </div>
-                <div>
+
+                <!-- End Date -->
+                <div class="w-full md:w-auto">
                     <label class="block text-gray-700 text-xs font-bold mb-1">Sampai</label>
                     <input type="date" name="end_date" value="{{ request('end_date') }}" 
-                           class="shadow border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm">
+                           class="w-full shadow-sm border border-gray-300 rounded px-3 py-2 text-gray-700 text-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- Search -->
+                <div class="w-full md:flex-1">
+                    <label class="block text-gray-700 text-xs font-bold mb-1">Cari Pelanggan</label>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Nama Pelanggan..." 
+                           class="w-full shadow-sm border border-gray-300 rounded px-3 py-2 text-gray-700 text-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-2 w-full md:w-auto">
+                    <button type="submit" class="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm transition">
+                        Filter
+                    </button>
+                    <a href="{{ route('bon.index') }}" class="flex-1 md:flex-none bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded text-sm text-center transition flex items-center justify-center">
+                        Reset
+                    </a>
                 </div>
             </div>
-
-            <!-- Search -->
-            <div class="flex-1 w-full">
-                <label class="block text-gray-700 text-xs font-bold mb-1">Cari Pelanggan</label>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Nama Pelanggan..." 
-                       class="shadow border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline w-full text-sm">
-            </div>
-
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded h-10 text-sm">
-                Filter
-            </button>
-            <a href="{{ route('bon.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded h-10 flex items-center justify-center text-sm">
-                Reset
-            </a>
         </form>
     </div>
 

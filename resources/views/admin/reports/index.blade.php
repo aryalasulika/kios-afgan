@@ -4,100 +4,55 @@
     <h1 class="text-3xl font-bold mb-6 text-gray-800">Laporan Penjualan</h1>
 
     <!-- Filter -->
-    <div class="bg-white p-4 rounded shadow mb-6">
-        <form action="{{ route('reports.index') }}" method="GET" class="flex flex-wrap gap-4 items-end">
-            <!-- Period Selector -->
-            <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Periode</label>
-                <select name="period" id="periodSelect" onchange="toggleInputs()"
-                    class="shadow border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline w-40">
-                    <option value="day" {{ $period === 'day' ? 'selected' : '' }}>Harian</option>
-                    <option value="week" {{ $period === 'week' ? 'selected' : '' }}>Mingguan</option>
-                    <option value="month" {{ $period === 'month' ? 'selected' : '' }}>Bulanan</option>
-                    <option value="year" {{ $period === 'year' ? 'selected' : '' }}>Tahunan</option>
-                </select>
-            </div>
+    <div class="bg-white p-6 rounded shadow mb-6">
+        <form action="{{ route('reports.index') }}" method="GET">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                <!-- Date Range -->
+                <div class="md:col-span-2">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Dari Tanggal</label>
+                    <input type="date" name="start_date" value="{{ request('start_date') }}"
+                        class="w-full shadow border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline">
+                </div>
 
-            <!-- Date Input (Day/Week) -->
-            <div id="dateInputGroup">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Tanggal</label>
-                <input type="date" name="date" value="{{ $date }}"
-                    class="shadow border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline">
-            </div>
+                <div class="md:col-span-2">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Sampai Tanggal</label>
+                    <input type="date" name="end_date" value="{{ request('end_date') }}"
+                        class="w-full shadow border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline">
+                </div>
 
-            <!-- Month Input -->
-            <div id="monthInputGroup" class="hidden">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Bulan</label>
-                <input type="month" name="month" value="{{ $month }}"
-                    class="shadow border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline">
-            </div>
+                <!-- Payment Filter -->
+                <div class="md:col-span-2">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Metode</label>
+                    <select name="payment_method" class="w-full shadow border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline">
+                        <option value="">Semua</option>
+                        <option value="cash" {{ request('payment_method') === 'cash' ? 'selected' : '' }}>Tunai</option>
+                        <option value="qris" {{ request('payment_method') === 'qris' ? 'selected' : '' }}>QRIS</option>
+                        <option value="bon" {{ request('payment_method') === 'bon' ? 'selected' : '' }}>Bon</option>
+                    </select>
+                </div>
 
-            <!-- Year Input -->
-            <div id="yearInputGroup" class="hidden">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Tahun</label>
-                <select name="year"
-                    class="shadow border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline w-32">
-                    @for($y = date('Y'); $y >= 2024; $y--)
-                        <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
-                    @endfor
-                </select>
-            </div>
+                <!-- Status Filter -->
+                <div class="md:col-span-2">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Status</label>
+                    <select name="status" class="w-full shadow border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline">
+                        <option value="">Semua</option>
+                        <option value="paid" {{ request('status') === 'paid' ? 'selected' : '' }}>Lunas</option>
+                        <option value="unpaid" {{ request('status') === 'unpaid' ? 'selected' : '' }}>Belum Lunas</option>
+                    </select>
+                </div>
 
-            <!-- Payment Filter -->
-            <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Metode</label>
-                <select name="payment_method" class="shadow border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline w-32">
-                    <option value="">Semua</option>
-                    <option value="cash" {{ request('payment_method') === 'cash' ? 'selected' : '' }}>Tunai</option>
-                    <option value="qris" {{ request('payment_method') === 'qris' ? 'selected' : '' }}>QRIS</option>
-                    <option value="bon" {{ request('payment_method') === 'bon' ? 'selected' : '' }}>Bon</option>
-                </select>
+                <!-- Buttons -->
+                <div class="md:col-span-4 flex gap-2">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">
+                        Filter
+                    </button>
+                    <a href="{{ route('reports.index') }}" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded text-center transition flex items-center justify-center">
+                        Reset
+                    </a>
+                </div>
             </div>
-
-            <!-- Status Filter -->
-            <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Status</label>
-                <select name="status" class="shadow border rounded py-2 px-3 text-gray-700 focus:outline-none focus:shadow-outline w-32">
-                    <option value="">Semua</option>
-                    <option value="paid" {{ request('status') === 'paid' ? 'selected' : '' }}>Lunas</option>
-                    <option value="unpaid" {{ request('status') === 'unpaid' ? 'selected' : '' }}>Belum Lunas</option>
-                </select>
-            </div>
-
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded h-10">
-                Filter
-            </button>
-            
-            <a href="{{ route('reports.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded h-10 flex items-center justify-center">
-                Reset
-            </a>
         </form>
     </div>
-
-    <script>
-        function toggleInputs() {
-            const period = document.getElementById('periodSelect').value;
-            const dateGroup = document.getElementById('dateInputGroup');
-            const monthGroup = document.getElementById('monthInputGroup');
-            const yearGroup = document.getElementById('yearInputGroup');
-
-            // Reset visibility
-            dateGroup.classList.add('hidden');
-            monthGroup.classList.add('hidden');
-            yearGroup.classList.add('hidden');
-
-            if (period === 'day' || period === 'week') {
-                dateGroup.classList.remove('hidden');
-            } else if (period === 'month') {
-                monthGroup.classList.remove('hidden');
-            } else if (period === 'year') {
-                yearGroup.classList.remove('hidden');
-            }
-        }
-
-        // Init on load
-        toggleInputs();
-    </script>
 
     <!-- Stats -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
