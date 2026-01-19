@@ -12,10 +12,19 @@ class CashierController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $cashiers = User::where('role', 'kasir')
-            ->orderBy('created_at', 'desc')
+        $query = User::where('role', 'kasir');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('username', 'like', "%{$search}%");
+            });
+        }
+
+        $cashiers = $query->orderBy('created_at', 'desc')
             ->paginate(20);
 
         return view('admin.cashiers.index', compact('cashiers'));

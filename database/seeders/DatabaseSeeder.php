@@ -13,8 +13,22 @@ class DatabaseSeeder extends Seeder
     {
         // Admin
         User::create([
-            'username' => 'admin',
-            'password' => Hash::make('password'),
+            'username' => 'bundahara',
+            'password' => Hash::make('R4yan1234'),
+            'role' => 'admin',
+            'is_active' => true,
+        ]);
+
+        User::create([
+            'username' => 'pakbos',
+            'password' => Hash::make('P4k4arman'),
+            'role' => 'admin',
+            'is_active' => true,
+        ]);
+
+        User::create([
+            'username' => 'arya',
+            'password' => Hash::make('arya2828'),
             'role' => 'admin',
             'is_active' => true,
         ]);
