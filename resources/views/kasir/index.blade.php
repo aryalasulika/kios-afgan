@@ -751,6 +751,28 @@
                     }
                 });
 
+                // Keep Alive Script
+                const keepAliveUrl = "{{ route('session.keep-alive') }}";
+                function keepAlive() {
+                    fetch(keepAliveUrl, {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest', // Mark as AJAX
+                            'Accept': 'application/json'
+                        }
+                    }).then(response => {
+                        if (!response.ok) {
+                            console.warn('Keep-alive failed:', response.status);
+                        }
+                    }).catch(error => {
+                        console.error('Keep-alive error:', error);
+                    });
+                }
+                
+                // Ping every 5 minutes (300,000 ms)
+                setInterval(keepAlive, 300000);
+
+
             </script>
 </body>
 

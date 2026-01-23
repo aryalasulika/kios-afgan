@@ -12,6 +12,9 @@ Route::get('/kasir/login', [AuthController::class, 'loginKasirForm'])->name('kas
 Route::post('/kasir/login', [AuthController::class, 'loginKasir']);
 Route::get('/admin/login', [AuthController::class, 'loginAdminForm'])->name('admin.login');
 Route::post('/admin/login', [AuthController::class, 'loginAdmin']);
+Route::get('/session-keep-alive', function () {
+    return response()->json(['status' => 'ok']);
+})->name('session.keep-alive');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth:kasir'])->prefix('kasir')->group(function () {
